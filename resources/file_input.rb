@@ -23,6 +23,7 @@ property :severity, String
 property :facility, String
 property :cookbook_source, String, default: 'rsyslog'
 property :template_source, String, default: 'file-input.conf.erb'
+property :restart_service, [true, false], default: true
 
 action :create do
   log_name = new_resource.name
@@ -40,8 +41,10 @@ action :create do
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  service node['rsyslog']['service_name'] do
-    supports restart: true, status: true
-    action [:enable, :start]
+  if new_resource.restart_service
+    service node['rsyslog']['service_name'] do
+      supports restart: true, status: true
+      action [:enable, :start]
+    end
   end
 end
