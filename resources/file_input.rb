@@ -25,6 +25,8 @@ property :cookbook_source, String, default: 'rsyslog'
 property :template_source, String, default: 'file-input.conf.erb'
 property :restart_service, [true, false], default: true
 
+$num_file_inputs = 0
+
 action :create do
   log_name = new_resource.name
   template "/etc/rsyslog.d/#{new_resource.priority}-#{new_resource.name}.conf" do
@@ -40,6 +42,8 @@ action :create do
               'facility' => new_resource.facility
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
+
+  $num_file_inputs += 1
 
   if new_resource.restart_service
     service node['rsyslog']['service_name'] do
