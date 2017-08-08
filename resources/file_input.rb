@@ -43,8 +43,9 @@ action :create do
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  file imfile_config_path do
+  file 'imfile-config' do
     not_if { ::File.exist?(imfile_config_path) }
+    path imfile_config_path
     mode '0664'
     owner node['rsyslog']['user']
     group node['rsyslog']['group']
