@@ -27,7 +27,6 @@ property :restart_service, [true, false], default: true
 
 action :create do
   log_name = new_resource.name
-  imfile_config_path = '/etc/rsyslog.d/00-imfile.conf'
 
   template "/etc/rsyslog.d/#{new_resource.priority}-#{new_resource.name}.conf" do
     mode '0664'
@@ -43,14 +42,12 @@ action :create do
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  file 'imfile-config' do
-    not_if { ::File.exist?(imfile_config_path) }
-    path imfile_config_path
+  file '/etc/rsyslog.d/00-imfile.conf' do
     mode '0664'
     owner node['rsyslog']['user']
     group node['rsyslog']['group']
     content '$ModLoad imfile'
-    action :create
+    action :create_if_missing
   end
 
   if new_resource.restart_service
