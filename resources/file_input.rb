@@ -34,7 +34,7 @@ action :create do
     group node['rsyslog']['group']
     source new_resource.template_source
     cookbook new_resource.cookbook_source
-    variables 'file_name' => new_resource.file,
+    variables 'file_name' => new_resource.path,
               'tag' => log_name,
               'state_file' => log_name,
               'severity' => new_resource.severity,
