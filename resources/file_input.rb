@@ -17,7 +17,7 @@
 #
 
 property :name, String, name_attribute: true, required: true
-property :path, String, required: true
+property :file, String, required: true
 property :priority, Integer, default: 99
 property :severity, String
 property :facility, String
@@ -34,7 +34,7 @@ action :create do
     group node['rsyslog']['group']
     source new_resource.template_source
     cookbook new_resource.cookbook_source
-    variables 'file_name' => new_resource.path,
+    variables 'file_name' => new_resource.file,
               'tag' => log_name,
               'state_file' => log_name,
               'severity' => new_resource.severity,
@@ -42,11 +42,11 @@ action :create do
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  file '/etc/rsyslog.d/00-imfile.conf' do
+  template '/etc/rsyslog.d/00-imfile.conf' do
     mode '0664'
     owner node['rsyslog']['user']
     group node['rsyslog']['group']
-    content '$ModLoad imfile'
+    source "00-imfile.conf.erb"
     action :create_if_missing
   end
 
