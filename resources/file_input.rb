@@ -25,10 +25,9 @@ property :cookbook_source, String, default: 'rsyslog'
 property :template_source, String, default: 'file-input.conf.erb'
 property :restart_service, [true, false], default: true
 
-$num_file_inputs = 0
-
 action :create do
   log_name = new_resource.name
+
   template "/etc/rsyslog.d/#{new_resource.priority}-#{new_resource.name}.conf" do
     mode '0664'
     owner node['rsyslog']['user']
@@ -43,7 +42,14 @@ action :create do
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  $num_file_inputs += 1
+  template '/etc/rsyslog.d/00-imfile.conf' do
+    mode '0664'
+    owner node['rsyslog']['user']
+    group node['rsyslog']['group']
+    source "00-imfile.conf.erb"
+    cookbook new_resource.cookbook_source
+    action :create_if_missing
+  end
 
   if new_resource.restart_service
     service node['rsyslog']['service_name'] do
