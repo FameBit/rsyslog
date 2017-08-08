@@ -47,6 +47,7 @@ action :create do
     owner node['rsyslog']['user']
     group node['rsyslog']['group']
     source "00-imfile.conf.erb"
+    cookbook new_resource.cookbook_source
     action :create_if_missing
   end
 
