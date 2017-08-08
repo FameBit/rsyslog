@@ -25,10 +25,10 @@ property :cookbook_source, String, default: 'rsyslog'
 property :template_source, String, default: 'file-input.conf.erb'
 property :restart_service, [true, false], default: true
 
-$num_file_inputs = 0
-
 action :create do
   log_name = new_resource.name
+  imfile_config_path = '/etc/rsyslog.d/00-imfile.conf'
+
   template "/etc/rsyslog.d/#{new_resource.priority}-#{new_resource.name}.conf" do
     mode '0664'
     owner node['rsyslog']['user']
@@ -39,12 +39,18 @@ action :create do
               'tag' => log_name,
               'state_file' => log_name,
               'severity' => new_resource.severity,
-              'facility' => new_resource.facility,
-              'load_module' => (Counter::get_count() === 0)
+              'facility' => new_resource.facility
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  Counter::increment_count()
+  file imfile_config_path do
+    not_if { ::File.exist?(imfile_config_path) }
+    mode '0664'
+    owner node['rsyslog']['user']
+    group node['rsyslog']['group']
+    content '$ModLoad imfile'
+    action :create
+  end
 
   if new_resource.restart_service
     service node['rsyslog']['service_name'] do
