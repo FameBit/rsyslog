@@ -39,11 +39,9 @@ action :create do
               'tag' => log_name,
               'state_file' => log_name,
               'severity' => new_resource.severity,
-              'facility' => new_resource.facility
+              'facility' => new_resource.facility,
+              'load_module' => (Counter::get_count() === 0)
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
-    variables(
-        :load_module => (Counter::get_count() === 0)
-    )
   end
 
   Counter::increment_count()
