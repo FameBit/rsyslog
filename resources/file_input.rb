@@ -41,9 +41,9 @@ action :create do
               'severity' => new_resource.severity,
               'facility' => new_resource.facility
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
-    variables vars: {
+    variables(
         :load_module => (Counter::get_count() === 0)
-    }
+    )
   end
 
   Counter::increment_count()
