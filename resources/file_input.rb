@@ -43,7 +43,7 @@ action :create do
     notifies :restart, "service[#{node['rsyslog']['service_name']}]", :delayed
   end
 
-  $num_file_inputs += 1
+  Counter::increment_count()
 
   if new_resource.restart_service
     service node['rsyslog']['service_name'] do
