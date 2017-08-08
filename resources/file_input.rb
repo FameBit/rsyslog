@@ -17,7 +17,7 @@
 #
 
 property :name, String, name_attribute: true, required: true
-property :file, String, required: true
+property :path, String, required: true
 property :priority, Integer, default: 99
 property :severity, String
 property :facility, String
